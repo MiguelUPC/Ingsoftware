@@ -13,7 +13,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
   String _email = '';
   String _password = '';
   String _phone = ''; // Nuevo campo de número de teléfono
-  String _role = 'médico'; // Rol por defecto
+  String _role = 'medico'; // Rol por defecto
   String _identificacion = ''; // Nuevo campo para la identificación
   DateTime _fechaNacimiento = DateTime.now(); // Nuevo campo para la fecha de nacimiento
   bool _activo = true; // Nuevo campo para el estado activo

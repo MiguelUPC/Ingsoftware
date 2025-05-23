@@ -164,7 +164,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 value: newRole,
                 items: [
                   DropdownMenuItem(child: Text('Administrador'), value: 'administrador'),
-                  DropdownMenuItem(child: Text('Médico'), value: 'médico'),
+                  DropdownMenuItem(child: Text('Médico'), value: 'medico'),
                 ],
                 onChanged: (value) {
                   if (value != null) {
