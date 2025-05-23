@@ -16,9 +16,10 @@ class AdminScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Panel de Administración'),
+        title: Text('Panel de Administración', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blue, // Fondo del AppBar
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context); // Volver a la pantalla anterior
           },
@@ -26,7 +27,7 @@ class AdminScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_add),
+            icon: const Icon(Icons.person_add, color: Colors.white),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => AddUserScreen()));
             },
@@ -34,6 +35,7 @@ class AdminScreen extends StatelessWidget {
           ),
         ],
       ),
+      backgroundColor: Colors.white, // Fondo de la pantalla
       body: Column(
         children: [
           // Botón para controlar usuarios
@@ -47,6 +49,9 @@ class AdminScreen extends StatelessWidget {
                 );
               },
               child: Text('Controlar Usuarios'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 67, 190, 43), // Texto blanco
+              ),
             ),
           ),
 
@@ -63,20 +68,27 @@ class AdminScreen extends StatelessWidget {
                   itemCount: facturas.length,
                   itemBuilder: (context, index) {
                     var factura = facturas[index];
-                    return ListTile(
-                      title: Text('Factura: ${factura.id}'),
-                      subtitle: Text('Estado: ${factura['estado']}'),
-                      trailing: factura['estado'] != 'anulada'
-                          ? ElevatedButton(
-                              onPressed: () {
-                                _anularFactura(factura.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Factura anulada')),
-                                );
-                              },
-                              child: Text('Anular Factura'),
-                            )
-                          : Text('Anulada'),
+                    return Card(
+                      color: const Color.fromARGB(202, 226, 222, 222), // Fondo gris de cada tarjeta
+                      margin: EdgeInsets.all(8.0), // Espaciado entre tarjetas
+                      child: ListTile(
+                        title: Text('Factura: ${factura.id}', style: TextStyle(color: Colors.black)),
+                        subtitle: Text('Estado: ${factura['estado']}', style: TextStyle(color: Colors.black)),
+                        trailing: factura['estado'] != 'anulada'
+                            ? ElevatedButton(
+                                onPressed: () {
+                                  _anularFactura(factura.id);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Factura anulada')),
+                                  );
+                                },
+                                child: Text('Anular Factura'),
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white, backgroundColor: Colors.red, // Texto blanco
+                                ),
+                              )
+                            : Text('Anulada', style: TextStyle(color: Colors.red)),
+                      ),
                     );
                   },
                 );

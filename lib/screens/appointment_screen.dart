@@ -1,80 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:medicalife/screens/home_screen.dart';
 
 class AppointmentScreen extends StatefulWidget {
   @override
-  _AddAppointmentScreenState createState() => _AddAppointmentScreenState();
+  _AppointmentScreenState createState() => _AppointmentScreenState();
 }
 
-class _AddAppointmentScreenState extends State<AppointmentScreen> {
+class _AppointmentScreenState extends State<AppointmentScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final TextEditingController _pacienteController = TextEditingController();
   final TextEditingController _medicoController = TextEditingController();
   final TextEditingController _descripcionController = TextEditingController();
 
   String? _pacienteNombre;
   String? _medicoNombre;
-  bool _pacienteExists = false;
-  bool _medicoExists = false;
-  DateTime? _selectedDateTime; // Controlador para fecha y hora
+  bool _isLoadingPaciente = false;
+  bool _isLoadingMedico = false;
+  DateTime? _selectedDateTime;
 
-  Future<void> _checkPaciente() async {
-    String identificacion = _pacienteController.text;
+  Future<void> _searchPaciente() async {
+    setState(() => _isLoadingPaciente = true);
+
     final QuerySnapshot querySnapshot = await _firestore
         .collection('users')
-        .where('identificacion', isEqualTo: identificacion)
+        .where('identificacion', isEqualTo: _pacienteController.text)
         .get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      setState(() {
+    setState(() {
+      if (querySnapshot.docs.isNotEmpty) {
         _pacienteNombre = querySnapshot.docs[0]['nombre'];
-        _pacienteExists = true;
-      });
-    } else {
-      setState(() {
-        _pacienteExists = false;
+      } else {
         _pacienteNombre = null;
-      });
-    }
+      }
+      _isLoadingPaciente = false;
+    });
   }
 
-  Future<void> _checkMedico() async {
-    String identificacion = _medicoController.text;
+  Future<void> _searchMedico() async {
+    setState(() => _isLoadingMedico = true);
+
     final QuerySnapshot querySnapshot = await _firestore
         .collection('users')
-        .where('identificacion', isEqualTo: identificacion)
+        .where('identificacion', isEqualTo: _medicoController.text)
         .where('rol', isEqualTo: 'medico')
         .get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      setState(() {
+    setState(() {
+      if (querySnapshot.docs.isNotEmpty) {
         _medicoNombre = querySnapshot.docs[0]['nombre'];
-        _medicoExists = true;
-      });
-    } else {
-      setState(() {
-        _medicoExists = false;
+      } else {
         _medicoNombre = null;
-      });
-    }
+      }
+      _isLoadingMedico = false;
+    });
   }
 
   Future<void> _selectDateTime(BuildContext context) async {
-    // Seleccionar fecha
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: _selectedDateTime ?? DateTime.now(),
+      initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2101),
     );
 
     if (pickedDate != null) {
-      // Seleccionar hora
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(_selectedDateTime ?? DateTime.now()),
+        initialTime: TimeOfDay.now(),
       );
 
       if (pickedTime != null) {
@@ -91,58 +85,32 @@ class _AddAppointmentScreenState extends State<AppointmentScreen> {
     }
   }
 
-  Future<bool> _isAppointmentConflict(DateTime selectedDateTime, String medicoId) async {
-    final startTime = selectedDateTime;
-    final endTime = selectedDateTime.add(Duration(minutes: 20));
-
-    final QuerySnapshot querySnapshot = await _firestore
-        .collection('appointments')
-        .where('medico_id', isEqualTo: medicoId)
-        .where('fecha', isGreaterThan: startTime)
-        .where('fecha', isLessThan: endTime)
-        .get();
-
-    return querySnapshot.docs.isNotEmpty; // Conflicto si hay citas dentro del rango
-  }
-
   Future<void> _addAppointment() async {
-    if (_pacienteExists && _medicoExists && _selectedDateTime != null) {
-      bool conflict = await _isAppointmentConflict(_selectedDateTime!, _medicoController.text);
-      
-      if (conflict) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Conflicto: El médico ya tiene una cita en este horario.')),
-        );
-        return; // Salir si hay conflicto
-      }
-
+    if (_pacienteNombre != null && _medicoNombre != null && _selectedDateTime != null) {
       await _firestore.collection('appointments').add({
-  'paciente_id': _pacienteController.text,
-  'medico_id': _medicoController.text,
-  'fecha': Timestamp.fromDate(_selectedDateTime!), // Convertir DateTime a Timestamp
-  'descripcion': _descripcionController.text,
-  'estado': 'pendiente',
-});
-
+        'paciente_id': _pacienteController.text,
+        'medico_id': _medicoController.text,
+        'fecha': Timestamp.fromDate(_selectedDateTime!),
+        'descripcion': _descripcionController.text,
+        'estado': 'pendiente',
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Cita añadida')),
+        SnackBar(content: Text('Cita añadida con éxito')),
       );
 
-      // Limpiar los campos después de añadir la cita
-      _pacienteController.clear();
-      _medicoController.clear();
-      _descripcionController.clear();
+      // Limpiar los datos
       setState(() {
-        _pacienteExists = false;
-        _medicoExists = false;
+        _pacienteController.clear();
+        _medicoController.clear();
+        _descripcionController.clear();
         _pacienteNombre = null;
         _medicoNombre = null;
-        _selectedDateTime = null; // Reiniciar la fecha seleccionada
+        _selectedDateTime = null;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('El paciente o médico no existen, o la fecha no fue seleccionada.')),
+        SnackBar(content: Text('Por favor complete todos los campos')),
       );
     }
   }
@@ -151,71 +119,101 @@ class _AddAppointmentScreenState extends State<AppointmentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Añadir Cita'),
-        leading: IconButton(
-          icon: Icon(Icons.home),
-          onPressed: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-          },
-          tooltip: 'Volver al Home',
-        ),
+        title: Text('Añadir Cita', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _pacienteController,
-              decoration: InputDecoration(labelText: 'ID del Paciente'),
-              onChanged: (value) {
-                _checkPaciente();
-              },
-            ),
-            if (_pacienteExists) ...[
-              Text('Paciente encontrado: $_pacienteNombre', style: TextStyle(color: Colors.green)),
-            ] else if (_pacienteNombre == null && _pacienteController.text.isNotEmpty) ...[
-              Text('Paciente no encontrado', style: TextStyle(color: Colors.red)),
-            ],
-            TextField(
-              controller: _medicoController,
-              decoration: InputDecoration(labelText: 'ID del Médico'),
-              onChanged: (value) {
-                _checkMedico();
-              },
-            ),
-            if (_medicoExists) ...[
-              Text('Médico encontrado: $_medicoNombre', style: TextStyle(color: Colors.green)),
-            ] else if (_medicoNombre == null && _medicoController.text.isNotEmpty) ...[
-              Text('Médico no encontrado', style: TextStyle(color: Colors.red)),
-            ],
-            TextField(
-              controller: _descripcionController,
-              decoration: InputDecoration(labelText: 'Descripción de la Cita'),
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _selectedDateTime == null
-                      ? 'Fecha y Hora: No seleccionada'
-                      : 'Fecha y Hora: ${DateFormat('dd/MM/yyyy HH:mm').format(_selectedDateTime!)}',
-                  style: TextStyle(fontSize: 16),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              _buildTextField(
+                controller: _pacienteController,
+                labelText: 'ID del Paciente',
+                icon: Icons.person,
+                onChanged: (_) => _searchPaciente(),
+              ),
+              if (_isLoadingPaciente) CircularProgressIndicator(),
+              if (_pacienteNombre != null)
+                Text('Paciente: $_pacienteNombre', style: TextStyle(color: Colors.green))
+              else if (_pacienteController.text.isNotEmpty && !_isLoadingPaciente)
+                Text('Paciente no encontrado', style: TextStyle(color: Colors.red)),
+
+              SizedBox(height: 20),
+              _buildTextField(
+                controller: _medicoController,
+                labelText: 'ID del Médico',
+                icon: Icons.local_hospital,
+                onChanged: (_) => _searchMedico(),
+              ),
+              if (_isLoadingMedico) CircularProgressIndicator(),
+              if (_medicoNombre != null)
+                Text('Médico: $_medicoNombre', style: TextStyle(color: Colors.green))
+              else if (_medicoController.text.isNotEmpty && !_isLoadingMedico)
+                Text('Médico no encontrado', style: TextStyle(color: Colors.red)),
+
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => _selectDateTime(context),
+                child: AbsorbPointer(
+                  child: _buildTextField(
+                    controller: TextEditingController(
+                      text: _selectedDateTime == null
+                          ? ''
+                          : DateFormat('yyyy-MM-dd HH:mm').format(_selectedDateTime!),
+                    ),
+                    labelText: 'Fecha y Hora de la Cita',
+                    icon: Icons.calendar_today,
+                    readOnly: true,
+                  ),
                 ),
-                TextButton(
-                  onPressed: () => _selectDateTime(context),
-                  child: Text('Seleccionar Fecha y Hora'),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _addAppointment,
-              child: Text('Añadir Cita'),
-            ),
-          ],
+              ),
+              SizedBox(height: 20),
+              _buildTextField(
+                controller: _descripcionController,
+                labelText: 'Descripción',
+                icon: Icons.notes,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _addAppointment,
+                child: Text('Añadir Cita', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    IconData? icon,
+    bool readOnly = false,
+    Function(String)? onChanged,
+  }) {
+    return TextField(
+      controller: controller,
+      readOnly: readOnly,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w600,
+        ),
+        prefixIcon: Icon(icon, color: Colors.blue),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.blue),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.green),
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      onChanged: onChanged,
     );
   }
 }

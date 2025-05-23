@@ -12,18 +12,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   late Stream<QuerySnapshot> _usersStream;
-  String _searchQuery = ''; // Para almacenar el texto de búsqueda
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    // Inicializa el stream para escuchar los cambios en la colección de usuarios
     _usersStream = _firestore.collection('users').snapshots();
   }
 
   Future<void> _deleteUser(String userId) async {
     try {
-      // Eliminar el usuario de Firestore
       await _firestore.collection('users').doc(userId).delete();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Usuario eliminado correctamente')),
@@ -37,7 +35,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Future<void> _updateUser(String userId, Map<String, dynamic> updatedData) async {
     try {
-      // Actualizar los datos del usuario en Firestore
       await _firestore.collection('users').doc(userId).update(updatedData);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Datos actualizados correctamente')),
@@ -53,16 +50,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Administrar Usuarios'),
+        title: Text('Administrar Usuarios', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color.fromARGB(255, 33, 150, 243),
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                _showSearchDialog();
-              },
-            ),
+          IconButton(
+            icon: Icon(Icons.search, color: Colors.white),
+            onPressed: _showSearchDialog,
           ),
         ],
       ),
@@ -78,25 +71,36 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           }
 
           final users = snapshot.data!.docs.where((user) {
-            // Filtrar usuarios por nombre o cédula
             final userData = user.data() as Map<String, dynamic>;
             return userData['identificacion'].toString().contains(_searchQuery) ||
-                   userData['nombre'].toLowerCase().contains(_searchQuery.toLowerCase());
+                userData['nombre'].toLowerCase().contains(_searchQuery.toLowerCase());
           }).toList();
 
           return ListView.builder(
+            padding: const EdgeInsets.all(8.0),
             itemCount: users.length,
             itemBuilder: (context, index) {
-              var userData = users[index].data() as Map<String, dynamic>;
-              var userId = users[index].id; // UID del usuario
-              
+              final userData = users[index].data() as Map<String, dynamic>;
+              final userId = users[index].id;
+
               return Card(
-                margin: EdgeInsets.all(8.0),
+                elevation: 4.0,
+                margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 child: ListTile(
-                  title: Text(userData['nombre']),
+                  contentPadding: const EdgeInsets.all(16.0),
+                  leading: CircleAvatar(
+                    backgroundColor: const Color.fromARGB(255, 33, 150, 243),
+                    child: Icon(Icons.person, color: Colors.white),
+                  ),
+                  title: Text(
+                    userData['nombre'],
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 8.0),
                       Text('Email: ${userData['email']}'),
                       Text('Teléfono: ${userData['telefono']}'),
                       Text('Rol: ${userData['rol']}'),
@@ -112,8 +116,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       }
                     },
                     itemBuilder: (context) => [
-                      PopupMenuItem(value: 'Eliminar', child: Text('Eliminar')),
                       PopupMenuItem(value: 'Editar', child: Text('Editar')),
+                      PopupMenuItem(value: 'Eliminar', child: Text('Eliminar')),
                     ],
                   ),
                 ),
@@ -124,7 +128,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       ),
     );
   }
-
+//agregar usuarios 
   void _showEditDialog(String userId, Map<String, dynamic> userData) {
     String newName = userData['nombre'];
     String newEmail = userData['email'];
@@ -165,6 +169,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 items: [
                   DropdownMenuItem(child: Text('Administrador'), value: 'administrador'),
                   DropdownMenuItem(child: Text('Médico'), value: 'medico'),
+                  DropdownMenuItem(child: Text('Paciente'), value: 'paciente')
                 ],
                 onChanged: (value) {
                   if (value != null) {
@@ -198,7 +203,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       },
     );
   }
-
+//filtrar usuarios
   void _showSearchDialog() {
     showDialog(
       context: context,

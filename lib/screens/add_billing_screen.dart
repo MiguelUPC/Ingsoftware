@@ -1,46 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:medicalife/screens/home_screen.dart';
 
 class AddBillingScreen extends StatefulWidget {
   @override
   _AddBillingScreenState createState() => _AddBillingScreenState();
 }
+
 class _AddBillingScreenState extends State<AddBillingScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _identificacionController = TextEditingController();
   final TextEditingController _montoController = TextEditingController();
 
-  String? _pacienteNombre;
-  bool _pacienteExists = false;
+  List<DocumentSnapshot> _pacientesList = [];
+  String? _selectedPacienteId;
+  String? _selectedPacienteNombre;
 
-  Future<void> _checkPaciente() async {
-    String identificacion = _identificacionController.text;
-
-    // Verificar si el paciente existe
+  Future<void> _searchPaciente(String query) async {
     final QuerySnapshot querySnapshot = await _firestore
         .collection('users')
-        .where('identificacion', isEqualTo: identificacion)
+        .where('nombre', isGreaterThanOrEqualTo: query)
+        .where('nombre', isLessThan: query + 'z')
         .get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      setState(() {
-        _pacienteNombre = querySnapshot.docs[0]['nombre'];
-        _pacienteExists = true;
-      });
-    } else {
-      setState(() {
-        _pacienteExists = false;
-        _pacienteNombre = null;
-      });
-    }
+    setState(() {
+      _pacientesList = querySnapshot.docs;
+    });
   }
 
   Future<void> _addFactura() async {
-    if (_pacienteExists) {
+    if (_selectedPacienteId != null) {
       await _firestore.collection('billing').add({
-        'paciente_id': _identificacionController.text,
+        'paciente_id': _selectedPacienteId,
         'monto': double.tryParse(_montoController.text) ?? 0.0,
         'fecha_emision': Timestamp.now(),
         'estado': 'pendiente',
@@ -51,12 +42,13 @@ class _AddBillingScreenState extends State<AddBillingScreen> {
       _identificacionController.clear();
       _montoController.clear();
       setState(() {
-        _pacienteExists = false;
-        _pacienteNombre = null;
+        _pacientesList.clear();
+        _selectedPacienteId = null;
+        _selectedPacienteNombre = null;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('El paciente no existe.')),
+        SnackBar(content: Text('Seleccione un paciente antes de añadir la factura.')),
       );
     }
   }
@@ -65,42 +57,126 @@ class _AddBillingScreenState extends State<AddBillingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Añadir Factura'),
+        title: const Text('Añadir Factura', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blue,
         leading: IconButton(
-          icon: Icon(Icons.home),
+          icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
           },
           tooltip: 'Volver al Home',
         ),
       ),
-      body: Padding(
+      body: Container(
+        color: Colors.white,
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Campo para buscar pacientes
             TextField(
               controller: _identificacionController,
-              decoration: InputDecoration(labelText: 'Identificación del Paciente'),
-              onChanged: (value) {
-                _checkPaciente();
-              },
+              style: const TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                labelText: 'Buscar Paciente',
+                prefixIcon: const Icon(Icons.search, color: Color.fromARGB(255, 33, 150, 243)),
+                labelStyle: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                filled: true,
+                fillColor: const Color(0xFFF3F4F6),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onChanged: (value) => _searchPaciente(value),
             ),
-            if (_pacienteExists) ...[
-              Text('Paciente encontrado: $_pacienteNombre', style: TextStyle(color: Colors.green)),
-            ] else if (_identificacionController.text.isNotEmpty) ...[
-              Text('Paciente no encontrado', style: TextStyle(color: Colors.red)),
+            const SizedBox(height: 16),
+
+            // Lista de pacientes
+            if (_pacientesList.isNotEmpty) ...[
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _pacientesList.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: ListTile(
+                        leading: const Icon(Icons.person, color: Color.fromARGB(255, 33, 150, 243)),
+                        title: Text(
+                          _pacientesList[index]['nombre'],
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _selectedPacienteId = _pacientesList[index]['identificacion'];
+                            _selectedPacienteNombre = _pacientesList[index]['nombre'];
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
+
+            // Paciente seleccionado
+            if (_selectedPacienteNombre != null) ...[
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8F5E9),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.green),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Paciente seleccionado: $_selectedPacienteNombre',
+                      style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Campo para el monto
             TextField(
               controller: _montoController,
-              decoration: InputDecoration(labelText: 'Monto'),
+              style: const TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                labelText: 'Monto',
+                prefixIcon: const Icon(Icons.monetization_on, color: Color.fromARGB(255, 33, 150, 243)),
+                labelStyle: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                filled: true,
+                fillColor: const Color(0xFFF3F4F6),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                _addFactura();
-              },
-              child: Text('Añadir Factura'),
+            const SizedBox(height: 16),
+
+            // Botón para añadir factura
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _addFactura,
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: const Text('Añadir Factura'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
