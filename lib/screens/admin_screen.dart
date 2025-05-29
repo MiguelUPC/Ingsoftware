@@ -19,6 +19,7 @@ class AdminScreen extends StatelessWidget {
         title: Text('Panel de Administración', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue, // Fondo del AppBar
         leading: IconButton(
+          key:const ValueKey('regresarcontx'),
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context); // Volver a la pantalla anterior
@@ -27,6 +28,8 @@ class AdminScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            
+            key:const ValueKey('Añadirusuario'),
             icon: const Icon(Icons.person_add, color: Colors.white),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => AddUserScreen()));
@@ -42,6 +45,7 @@ class AdminScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
+              key:const ValueKey('controlarusuaruios'),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -76,6 +80,7 @@ class AdminScreen extends StatelessWidget {
                         subtitle: Text('Estado: ${factura['estado']}', style: TextStyle(color: Colors.black)),
                         trailing: factura['estado'] != 'anulada'
                             ? ElevatedButton(
+                              key:const ValueKey('anularfactura'),
                                 onPressed: () {
                                   _anularFactura(factura.id);
                                   ScaffoldMessenger.of(context).showSnackBar(

@@ -108,6 +108,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     ],
                   ),
                   trailing: PopupMenuButton<String>(
+                    key:const ValueKey('listaedityeliminar'),
                     onSelected: (value) {
                       if (value == 'Eliminar') {
                         _deleteUser(userId);
@@ -116,8 +117,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       }
                     },
                     itemBuilder: (context) => [
-                      PopupMenuItem(value: 'Editar', child: Text('Editar')),
-                      PopupMenuItem(value: 'Eliminar', child: Text('Eliminar')),
+                      PopupMenuItem(key:const ValueKey('editar'),value: 'Editar', child: Text('Editar')),
+                      PopupMenuItem(key:const ValueKey('eliminar'),value: 'Eliminar', child: Text('Eliminar')),
                     ],
                   ),
                 ),
@@ -144,6 +145,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                key:const ValueKey('editnombre'),
                 decoration: InputDecoration(labelText: 'Nombre'),
                 onChanged: (value) {
                   newName = value;
@@ -151,6 +153,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 controller: TextEditingController(text: newName),
               ),
               TextField(
+                key:const ValueKey('editemail'),
                 decoration: InputDecoration(labelText: 'Email'),
                 onChanged: (value) {
                   newEmail = value;
@@ -158,6 +161,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 controller: TextEditingController(text: newEmail),
               ),
               TextField(
+                key:const ValueKey('edittelefono'),
                 decoration: InputDecoration(labelText: 'Teléfono'),
                 onChanged: (value) {
                   newPhone = value;
@@ -165,11 +169,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 controller: TextEditingController(text: newPhone),
               ),
               DropdownButton<String>(
+                key:const ValueKey('editmenurol'),
                 value: newRole,
                 items: [
-                  DropdownMenuItem(child: Text('Administrador'), value: 'administrador'),
-                  DropdownMenuItem(child: Text('Médico'), value: 'medico'),
-                  DropdownMenuItem(child: Text('Paciente'), value: 'paciente')
+                  DropdownMenuItem(key:const ValueKey('roladmin'),child: Text('Administrador'), value: 'administrador'),
+                  DropdownMenuItem(key:const ValueKey('rolmedico'),child: Text('Médico'), value: 'medico'),
+                  DropdownMenuItem(key:const ValueKey('rolpaciente'),child: Text('Paciente'), value: 'paciente')
                 ],
                 onChanged: (value) {
                   if (value != null) {
@@ -181,6 +186,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           ),
           actions: [
             TextButton(
+              key:const ValueKey('actualizaredit'),
               onPressed: () {
                 _updateUser(userId, {
                   'nombre': newName,
@@ -193,6 +199,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               child: Text('Actualizar'),
             ),
             TextButton(
+              key:const ValueKey('cancelaredit'),
               onPressed: () {
                 Navigator.of(context).pop();
               },

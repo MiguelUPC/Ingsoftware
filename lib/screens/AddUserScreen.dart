@@ -78,6 +78,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
               children: [
                 // Campo Nombre
                 TextFormField(
+                  key:const ValueKey('Nombreusu'),
                   decoration: InputDecoration(
                     labelText: 'Nombre',
                     prefixIcon: Icon(Icons.person, color: Colors.blue),
@@ -102,6 +103,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
                 // Campo Email
                 TextFormField(
+                  key:const ValueKey('emailusu'),
                   decoration: InputDecoration(
                     labelText: 'Correo electrónico',
                     prefixIcon: Icon(Icons.email, color: Colors.blue),
@@ -126,6 +128,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
                 // Campo Contraseña
                 TextFormField(
+                  key:const ValueKey('contraseñausu'),
                   decoration: InputDecoration(
                     labelText: 'Contraseña',
                     prefixIcon: Icon(Icons.lock, color: Colors.blue),
@@ -151,6 +154,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
                 // Campo Teléfono
                 TextFormField(
+                  key:const ValueKey('numtelusu'),
                   decoration: InputDecoration(
                     labelText: 'Número de teléfono',
                     prefixIcon: Icon(Icons.phone, color: Colors.blue),
@@ -175,6 +179,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
                 // Campo Identificación
                 TextFormField(
+                  key:const ValueKey('identificacionusu'),
                   decoration: InputDecoration(
                     labelText: 'Identificación',
                     prefixIcon: Icon(Icons.badge, color: Colors.blue),
@@ -199,6 +204,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
                 // Dropdown Rol
                 DropdownButtonFormField<String>(
+                  key:const ValueKey('rolusu'),
                   decoration: InputDecoration(
                     labelText: 'Rol',
                     prefixIcon: Icon(Icons.person_outline, color: Colors.blue),
@@ -212,14 +218,17 @@ class _AddUserScreenState extends State<AddUserScreen> {
                   value: _role,
                   items: const [
                     DropdownMenuItem(
+                      key:const ValueKey('roladmin'),
                       child: Text('Administrador'),
                       value: 'administrador',
                     ),
                     DropdownMenuItem(
+                      key:const ValueKey('rolmedico'),
                       child: Text('Médico'),
                       value: 'medico',
                     ),
                     DropdownMenuItem(
+                      key:const ValueKey('rolpaciente'),
                       child: Text('Paciente'),
                       value: 'paciente',
                     ),
@@ -234,6 +243,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
 
                 // Botón Añadir Usuario
                 SizedBox(
+                  key:const ValueKey('añadirusu'),
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: _addUser,

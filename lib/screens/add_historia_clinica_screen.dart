@@ -78,6 +78,7 @@ class _AddHistoriaClinicaScreenState extends State<AddHistoriaClinicaScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 TextFormField(
+                  key:const ValueKey('motivodeconsulta'),
                   controller: _motivoController,
                   decoration: InputDecoration(
                     labelText: 'Motivo de la consulta',
@@ -92,6 +93,7 @@ class _AddHistoriaClinicaScreenState extends State<AddHistoriaClinicaScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  key:const ValueKey('diagnostico'),
                   controller: _diagnosticoController,
                   decoration: InputDecoration(
                     labelText: 'Diagnóstico',
@@ -106,6 +108,7 @@ class _AddHistoriaClinicaScreenState extends State<AddHistoriaClinicaScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  key:const ValueKey('tratamiento'),
                   controller: _tratamientoController,
                   decoration: InputDecoration(
                     labelText: 'Tratamiento',
@@ -120,6 +123,7 @@ class _AddHistoriaClinicaScreenState extends State<AddHistoriaClinicaScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  key:const ValueKey('observaciones'),
                   controller: _observacionesController,
                   decoration: InputDecoration(
                     labelText: 'Observaciones',
@@ -136,6 +140,7 @@ class _AddHistoriaClinicaScreenState extends State<AddHistoriaClinicaScreen> {
                 _isSaving
                     ? Center(child: CircularProgressIndicator())
                     : ElevatedButton(
+                      key:const ValueKey('guardarhistclinica'),
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
                             _saveHistoriaClinica();
