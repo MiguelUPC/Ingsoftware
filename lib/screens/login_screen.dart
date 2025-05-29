@@ -59,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             // Campo de texto para el email
             TextField(
+              key:const ValueKey('email'),
               controller: _emailController,
               style: const TextStyle(color: Colors.black),
               decoration: InputDecoration(
@@ -81,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             // Campo de texto para la contraseña
             TextField(
+              key:const ValueKey('Password'),
               controller: _passwordController,
               obscureText: true,
               style: const TextStyle(color: Colors.black),

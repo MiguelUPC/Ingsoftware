@@ -95,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
+              key:const ValueKey('historiasclinicas'),
               leading: Icon(Icons.folder_open, color: Colors.white),
               title: Text('Historias Clínicas', style: TextStyle(color: Colors.white)),
               onTap: () {
@@ -109,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
+              key:const ValueKey('citasmedicas'),
               leading: Icon(Icons.calendar_month, color: Colors.white),
               title: Text('Citas Médicas', style: TextStyle(color: Colors.white)),
               onTap: () {
@@ -122,6 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             if (isAdmin)
               ListTile(
+                key:const ValueKey('administracion'),
                 leading: Icon(Icons.admin_panel_settings, color: Colors.white),
                 title: Text('Administración', style: TextStyle(color: Colors.white)),
                 onTap: () {
@@ -133,6 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             if (isAdmin || isMedico)
               ListTile(
+                key:const ValueKey('facturas'),
                 leading: Icon(Icons.receipt, color: Colors.white),
                 title: Text('Facturas', style: TextStyle(color: Colors.white)),
                 onTap: () {
@@ -143,6 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ListTile(
+              key:const ValueKey('cerrarsesion'),
               leading: Icon(Icons.exit_to_app, color: Colors.white),
               title: Text('Cerrar sesión', style: TextStyle(color: Colors.white)),
               onTap: () {
@@ -164,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSpacing: 12,
                 children: [
                   MenuOptionCard(
+                    key:const ValueKey('hisclinicasmenu'),
                     icon: Icons.folder_open,
                     label: 'Historias Clínicas',
                     onTap: () => Navigator.push(
@@ -176,6 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   MenuOptionCard(
+                    key:const ValueKey('citasmedmenu'),
                     icon: Icons.calendar_month,
                     label: 'Citas Médicas',
                     onTap: () => Navigator.push(
@@ -187,6 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   if (isAdmin)
                     MenuOptionCard(
+                      key:const ValueKey('adminmenu'),
                       icon: Icons.admin_panel_settings,
                       label: 'Administración',
                       onTap: () => Navigator.push(
@@ -196,6 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   if (isAdmin || isMedico)
                     MenuOptionCard(
+                      key:const ValueKey('facturasmenu'),
                       icon: Icons.receipt,
                       label: 'Facturas',
                       onTap: () => Navigator.push(

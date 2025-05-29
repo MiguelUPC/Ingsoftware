@@ -57,6 +57,7 @@ class _AddBillingScreenState extends State<AddBillingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        key:const ValueKey('añadirfacturabarra'),
         title: const Text('Añadir Factura', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
         leading: IconButton(
@@ -75,6 +76,7 @@ class _AddBillingScreenState extends State<AddBillingScreen> {
           children: [
             // Campo para buscar pacientes
             TextField(
+              key:const ValueKey('buscarpacientefiltro'),
               controller: _identificacionController,
               style: const TextStyle(color: Colors.black),
               decoration: InputDecoration(
@@ -101,10 +103,12 @@ class _AddBillingScreenState extends State<AddBillingScreen> {
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 4.0),
                       child: ListTile(
+                        key:const ValueKey('nombrepaciente'),
                         leading: const Icon(Icons.person, color: Color.fromARGB(255, 33, 150, 243)),
                         title: Text(
                           _pacientesList[index]['nombre'],
                           style: const TextStyle(color: Colors.black),
+                          
                         ),
                         onTap: () {
                           setState(() {
@@ -144,6 +148,7 @@ class _AddBillingScreenState extends State<AddBillingScreen> {
 
             // Campo para el monto
             TextField(
+              key:const ValueKey('monto'),
               controller: _montoController,
               style: const TextStyle(color: Colors.black),
               decoration: InputDecoration(
@@ -163,6 +168,7 @@ class _AddBillingScreenState extends State<AddBillingScreen> {
 
             // Botón para añadir factura
             SizedBox(
+              key:const ValueKey('añadirfactura'),
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _addFactura,
