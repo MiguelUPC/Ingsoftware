@@ -35,6 +35,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         ),
         backgroundColor: Colors.blue,
         leading: IconButton(
+          key:const ValueKey('home'),
           icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
             Navigator.pushReplacement(
@@ -56,6 +57,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
 
               return currentUser.rol != 'Paciente'
                   ? IconButton(
+                    key:const ValueKey('añadircita'),
                       icon: const Icon(Icons.event_note, color: Colors.white),
                       onPressed: () {
                         Navigator.pushReplacement(
@@ -69,6 +71,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
             },
           ),
           IconButton(
+            key:const ValueKey('logout'),
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () {
               Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
@@ -82,6 +85,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
+              key:const ValueKey('filtropacientes'),
               onChanged: (value) {
                 setState(() {
                   searchQuery = value.toLowerCase();
@@ -167,6 +171,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                               children: [
                                 if (cita['estado'] != 'vista')
                                   ElevatedButton(
+                                    key:const ValueKey('marcarcitavista'),
                                     onPressed: () {
                                       _marcarCitaComoVista(cita.id);
                                       ScaffoldMessenger.of(context)
@@ -183,6 +188,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                                     ),
                                   ),
                                 ElevatedButton(
+                                  key:const ValueKey('añadirhistclinica'),
                                   onPressed: () {
                                     Navigator.push(
                                       context,

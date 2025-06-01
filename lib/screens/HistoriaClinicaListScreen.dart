@@ -80,6 +80,7 @@ class HistoriaClinicaListScreen extends StatelessWidget {
 
           final userData = snapshot.data!;
           final rol = userData['rol'] ?? '';
+          // ignore: unused_local_variable
           final userId = _auth.currentUser!.uid;
 
           // Instancia del servicio

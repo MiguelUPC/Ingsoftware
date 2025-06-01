@@ -9,6 +9,7 @@ class UserManagementScreen extends StatefulWidget {
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // ignore: unused_field
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   late Stream<QuerySnapshot> _usersStream;
@@ -108,7 +109,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     ],
                   ),
                   trailing: PopupMenuButton<String>(
-                    key:const ValueKey('listaedityeliminar'),
+                    key:const ValueKey("listaedityeliminar"),
                     onSelected: (value) {
                       if (value == 'Eliminar') {
                         _deleteUser(userId);
