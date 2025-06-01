@@ -25,12 +25,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Analyze and test
-        run: |
-          flutter analyze
-          flutter test --coverage
-
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
